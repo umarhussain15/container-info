@@ -1,6 +1,8 @@
 package podsearch
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/umarhussain15/container-info/internal/core/ports"
 )
@@ -23,6 +25,11 @@ func (receiver *HTTPHandler) GetContainerInfo(c *fiber.Ctx) error {
 	pods, err := receiver.k8s.SearchPods(query)
 	if err != nil {
 		return err
+	}
+	if pods == nil || len(pods) < 1 {
+		return c.Status(404).JSON(fiber.Map{
+			"message": fmt.Sprintf("No pod found for %s", query),
+		})
 	}
 	return c.JSON(&pods)
 }
