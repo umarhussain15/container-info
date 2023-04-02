@@ -67,8 +67,8 @@ dockers:
     # Templates of the Docker image names.
     image_templates:
       - "docker.io/umarhussain/container-info:latest"
-      - "docker.io/umarhussain/container-info:{{ .Tag }}"
-      - "docker.io/umarhussain/container-info:v{{ .Major }}"
+#      - "docker.io/umarhussain/container-info:{{ .Tag }}"
+#      - "docker.io/umarhussain/container-info:v{{ .Major }}"
 
 
     # Skips the docker push.
