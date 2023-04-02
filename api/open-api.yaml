@@ -1,0 +1,57 @@
+openapi: 3.0.3
+info:
+  title: Container Info
+  description: A rest application which can query k8s api to get resources of the containers
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8000/'
+
+paths:
+  /container-resources:
+    get:
+      operationId: GetContainerInfo
+      parameters:
+        - in: query
+          name: pod-label
+          schema:
+            type: string
+          description: Optional k8s pod labels to filter results
+          allowEmptyValue: true
+      responses:
+        200:
+          description: Success response with list of matching container resources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    container_name:
+                      type: string
+                    pod_name:
+                      type: string
+                    namespace:
+                      type: string
+                    mem_req:
+                      type: string
+                    mem_limit:
+                      type: string
+                    cpu_req:
+                      type: string
+                    cpu_limit:
+                      type: string
+        500:
+          description: Invalid k8s label selector
+          content:
+            text/plain:
+              example: Invalid label selector
+        404:
+          description: No pod found matching the given pod-label
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
