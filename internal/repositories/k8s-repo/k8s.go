@@ -15,14 +15,6 @@ type K8sRepository struct {
 // NewInClusterSource generates an instance of repository which utilizes serviceaccount attached to the pod in cluster.
 func NewInClusterSource() (*K8sRepository, error) {
 	config, err := rest.InClusterConfig()
-	// kubeconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-	//	clientcmd.NewDefaultClientConfigLoadingRules(),
-	//	&clientcmd.ConfigOverrides{},
-	// )
-	// config, err := kubeconfig.ClientConfig()
-	// if err != nil {
-	//	return nil, err
-	// }
 	if err != nil {
 		return nil, err
 	}

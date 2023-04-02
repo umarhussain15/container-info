@@ -14,6 +14,7 @@ import (
 func main() {
 	source, err := k8srepo.NewInClusterSource()
 	if err != nil {
+		log.Fatalln(err)
 		return
 	}
 	handler := podsearch.NewHTTPHandler(source)
