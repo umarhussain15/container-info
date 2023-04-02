@@ -1,0 +1,110 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+    # you may remove this if you don't need go generate
+    - go generate ./...
+builds:
+  - main: ./cmd/app/
+    binary: app
+    id: build
+    env:
+      - GO111MODULE=on
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goamd64:
+      - v2
+    goarch:
+      - amd64
+
+archives:
+  - format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of uname.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+    - goos: windows
+      format: zip
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+dockers:
+  # You can have multiple Docker images.
+  -
+    # ID of the image, needed if you want to filter by it later on (e.g. on custom publishers).
+    id: container-info
+    ids:
+      - build
+
+    # GOOS of the built binaries/packages that should be used.
+    # Default: `linux`.
+    goos: linux
+
+    # GOARCH of the built binaries/packages that should be used.
+    # Default: `amd64`.
+    goarch: amd64
+
+    # GOAMD64 of the built binaries/packages that should be used.
+    # Default: `v1`.
+    goamd64: 'v2'
+
+    # Templates of the Docker image names.
+    image_templates:
+      - "docker.io/umarhussain/container-info:latest"
+      - "docker.io/umarhussain/container-info:{{ .Tag }}"
+      - "docker.io/umarhussain/container-info:v{{ .Major }}"
+
+
+    # Skips the docker push.
+    # Could be useful if you also do draft releases.
+    #
+    # If set to auto, the release will not be pushed to the Docker repository
+    #  in case there is an indicator of a prerelease in the tag, e.g. v1.0.0-rc1.
+    #
+    # Defaults to false.
+    skip_push: true
+
+    # Path to the Dockerfile (from the project root).
+    #
+    # Defaults to `Dockerfile`.
+    dockerfile: 'build/package/goreleaser.Dockerfile'
+
+    # Set the "backend" for the Docker pipe.
+    #
+    # Valid options are: docker, buildx, podman.
+    #
+    # Podman is a GoReleaser Pro feature and is only available on Linux.
+    #
+    # Defaults to docker.
+    use: docker
+
+    # Template of the docker build flags.
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--platform=linux/arm64"
+
+
+# The lines beneath this are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
