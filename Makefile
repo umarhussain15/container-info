@@ -25,3 +25,6 @@ build-snapshot:
 	@OUT_D=${OUT_D} GOOS=$(GOOS) GOARCH=$(GOARCH) goreleaser build --snapshot --clean
 	@echo "built ${OUT_D}/app"
 	@echo "DONE"
+
+helm-install:
+	@helm install container-info build/helm/container-info
