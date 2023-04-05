@@ -24,7 +24,7 @@ func main() {
 	app.Get("/container-resources", handler.GetContainerInfo)
 
 	host := utils.GetEnvOrDefault("HOST", "0.0.0.0")
-	port := utils.GetEnvOrDefault("PORT", "8089")
+	port := utils.GetEnvOrDefault("PORT", "8000")
 	err = app.Listen(fmt.Sprintf("%s:%s", host, port))
 	if err != nil {
 		log.Fatalln(err)
