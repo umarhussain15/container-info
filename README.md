@@ -42,3 +42,11 @@ key=value
 key!=value
 key1 in (app1,app2),key2=work,key3!=dev
 ```
+
+## Running Test Cases
+
+To run the unit tests of the application run the following command:
+
+```shell
+go test -v -cover ./...
+```

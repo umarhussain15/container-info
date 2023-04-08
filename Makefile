@@ -15,7 +15,7 @@ lint:
 .PHONY: test_unit
 test_unit:
 	@echo "--- Run unit tests ---"
-	@go test -cover ./...
+	@go test -v -cover ./...
 	@echo "DONE"
 
 
