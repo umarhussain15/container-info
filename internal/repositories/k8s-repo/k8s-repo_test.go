@@ -13,7 +13,7 @@ import (
 	testclient "k8s.io/client-go/kubernetes/fake"
 )
 
-func setupBefore() (*testclient.Clientset, K8sRepository) {
+func setupBefore() (*testclient.Clientset, K8sRepository, []v1.Pod) {
 	clientset := testclient.NewSimpleClientset()
 	repository := K8sRepository{client: clientset}
 
@@ -97,7 +97,7 @@ func setupBefore() (*testclient.Clientset, K8sRepository) {
 		log.Printf("Pod created %s\n", create.Name)
 	}
 
-	return clientset, repository
+	return clientset, repository, pods
 
 }
 
@@ -110,27 +110,41 @@ func cleanUpAfter(clientset kubernetes.Interface) {
 
 func TestK8sRepository_SearchPods(t *testing.T) {
 	searchLabel := "app.kubernetes.io/instance = app1"
-	clientset, repository := setupBefore()
+	clientset, repository, pods := setupBefore()
 
-	pods, err := repository.SearchPods(searchLabel)
+	containers, err := repository.SearchPods(searchLabel)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	assert.Equal(t, 1, len(pods))
+	assert.Equal(t, 1, len(containers))
 
 	searchMatch := "app.kubernetes.io/instance in (app1,app2)"
-	pods, err = repository.SearchPods(searchMatch)
+	containers, err = repository.SearchPods(searchMatch)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	assert.Equal(t, 3, len(pods))
+	assert.Equal(t, 3, len(containers))
+
+	searchWithValues := "app.kubernetes.io/instance = app2"
+	containers, err = repository.SearchPods(searchWithValues)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	assert.Equal(t, 2, len(containers))
+	expectedPod := pods[1]
+	for i, container := range containers {
+		assert.NotEqual(t, expectedPod.Spec.Containers[i].Resources.Limits.Cpu(), container.CPULimit)
+		assert.NotEqual(t, expectedPod.Spec.Containers[i].Resources.Requests.Cpu(), container.CPURequest)
+		assert.NotEqual(t, expectedPod.Spec.Containers[i].Resources.Limits.Memory(), container.MemoryLimit)
+		assert.NotEqual(t, expectedPod.Spec.Containers[i].Resources.Requests.Memory(), container.MemoryRequest)
+	}
 
 	cleanUpAfter(clientset)
 }
 
 func TestK8sRepository_SearchPods_NoMatch(t *testing.T) {
 	searchLabel := "app.kubernetes.io/instance notin (app1,app2)"
-	clientset, repository := setupBefore()
+	clientset, repository, _ := setupBefore()
 
 	pods, err := repository.SearchPods(searchLabel)
 	if err != nil {
@@ -143,7 +157,7 @@ func TestK8sRepository_SearchPods_NoMatch(t *testing.T) {
 
 func TestK8sRepository_SearchPods_ValuesNotPresent(t *testing.T) {
 	searchLabel := "app.kubernetes.io/instance = app1"
-	clientset, repository := setupBefore()
+	clientset, repository, _ := setupBefore()
 
 	pods, err := repository.SearchPods(searchLabel)
 	if err != nil {
