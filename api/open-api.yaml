@@ -17,6 +17,15 @@ paths:
             type: string
           description: Optional k8s pod labels to filter results
           allowEmptyValue: true
+          examples:
+            equal:
+              value: app.kubernetes.io/instance = app1
+            setMatch:
+              value: app.kubernetes.io/instance in (app1,app2)
+            notEqual:
+              value: key!=value
+            multiLabels:
+              value: key1 in (app1,app2),key2=work,key3!=dev
       responses:
         200:
           description: Success response with list of matching container resources
