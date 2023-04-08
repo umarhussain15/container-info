@@ -90,7 +90,6 @@ func setupBefore() (*testclient.Clientset, K8sRepository, []v1.Pod) {
 	}
 
 	for _, pod := range pods {
-
 		create, err := clientset.CoreV1().Pods(pod.Namespace).Create(context.TODO(), &pod, metav1.CreateOptions{})
 		if err != nil {
 			log.Fatal(err)
@@ -100,7 +99,6 @@ func setupBefore() (*testclient.Clientset, K8sRepository, []v1.Pod) {
 	}
 
 	return clientset, repository, pods
-
 }
 
 func cleanUpAfter(clientset kubernetes.Interface) {

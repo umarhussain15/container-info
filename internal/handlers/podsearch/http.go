@@ -27,7 +27,7 @@ func (receiver *HTTPHandler) GetContainerInfo(c *fiber.Ctx) error {
 		return err
 	}
 	if pods == nil || len(pods) < 1 {
-		return c.Status(404).JSON(fiber.Map{
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": fmt.Sprintf("No pod found for %s", query),
 		})
 	}
