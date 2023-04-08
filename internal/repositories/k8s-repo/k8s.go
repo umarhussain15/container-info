@@ -9,7 +9,7 @@ import (
 )
 
 type K8sRepository struct {
-	client *kubernetes.Clientset
+	client kubernetes.Interface
 }
 
 // NewInClusterSource generates an instance of repository which utilizes serviceaccount attached to the pod in cluster.
