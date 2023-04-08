@@ -28,6 +28,7 @@ func setupBefore() (*testclient.Clientset, K8sRepository, []v1.Pod) {
 				Namespace: "default",
 				Labels: map[string]string{
 					"app.kubernetes.io/instance": "app1",
+					"customLabel":                "label1",
 				},
 			},
 			Spec: v1.PodSpec{
@@ -50,6 +51,7 @@ func setupBefore() (*testclient.Clientset, K8sRepository, []v1.Pod) {
 				Namespace: "default",
 				Labels: map[string]string{
 					"app.kubernetes.io/instance": "app2",
+					"customLabel":                "label2",
 				},
 			},
 			Spec: v1.PodSpec{
@@ -138,6 +140,26 @@ func TestK8sRepository_SearchPods(t *testing.T) {
 		assert.NotEqual(t, expectedPod.Spec.Containers[i].Resources.Limits.Memory(), container.MemoryLimit)
 		assert.NotEqual(t, expectedPod.Spec.Containers[i].Resources.Requests.Memory(), container.MemoryRequest)
 	}
+
+	cleanUpAfter(clientset)
+}
+
+func TestK8sRepository_SearchPods_MultipleLabels(t *testing.T) {
+	multiLabels := "app.kubernetes.io/instance = app1,customLabel = label1"
+	clientset, repository, _ := setupBefore()
+
+	pods, err := repository.SearchPods(multiLabels)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	assert.Equal(t, 1, len(pods))
+	multiLabels = "app.kubernetes.io/instance = app1,customLabel = label2"
+
+	pods, err = repository.SearchPods(multiLabels)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	assert.Equal(t, 0, len(pods))
 
 	cleanUpAfter(clientset)
 }
