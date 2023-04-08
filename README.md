@@ -16,6 +16,8 @@ To build the docker image:
 goreleaser release --snapshot
 ```
 
+Note: Docker image built and uploaded to dockerhub under `umarhussain/container-info`
+
 ## Running the application
 
 The application will only run inside the kubernetes cluster since it will use `serviceaccount` token
