@@ -10,5 +10,5 @@ subjects:
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
-  name: view
+  name: {{ include "container-info.fullname" . }}-pod-view
   apiGroup: rbac.authorization.k8s.io
